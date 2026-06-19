@@ -1,0 +1,64 @@
+# Render Blueprint cho IF Team Web.
+# Tạo trên Render: New -> Blueprint -> chọn repo này.
+#
+# Kiến trúc: bỏ nginx, dùng 3 thành phần (Render tự cấp domain + HTTPS cho mỗi service):
+#   - ifweb-db    : PostgreSQL managed
+#   - if-team-api : Spring Boot API (Dockerfile gốc), cổng 8081, phục vụ /api và /uploads
+#   - if-team-web : Angular SSR (if-web-ui/Dockerfile)
+#
+# SAU KHI tạo Blueprint, vào dashboard điền tay biến SPRING_DATASOURCE_URL (xem ghi chú dưới).
+
+databases:
+  - name: ifweb-db
+    databaseName: ifweb
+    user: ifweb
+    plan: free   # Free hết hạn sau ~90 ngày; production nên đổi plan trả phí.
+
+services:
+  # ---------------- Backend (Spring Boot) ----------------
+  - type: web
+    name: if-team-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    disk:
+      # Bắt buộc: giữ ảnh upload qua các lần redeploy (filesystem Render là ephemeral).
+      name: uploads
+      mountPath: /app/uploads
+      sizeGB: 1
+    envVars:
+      # DB: user/password lấy tự động từ service ifweb-db.
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase: { name: ifweb-db, property: user }
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase: { name: ifweb-db, property: password }
+      # Render trả connectionString dạng postgresql://... (Spring không dùng trực tiếp được),
+      # nên điền tay ở dashboard: jdbc:postgresql://<internal-host>:5432/ifweb
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      # JWT secret tự sinh ngẫu nhiên (an toàn hơn giá trị mặc định trong code).
+      - key: APP_JWT_SECRET
+        generateValue: true
+      # CORS: phải đúng domain frontend, không có dấu "/" ở cuối.
+      - key: APP_CORS_ALLOWED_ORIGINS
+        value: https://if-team-web.onrender.com
+      - key: SERVER_FORWARD_HEADERS_STRATEGY
+        value: framework
+      - key: APP_UPLOAD_DIR
+        value: /app/uploads
+      - key: SPRING_JPA_SHOW_SQL
+        value: "false"
+
+  # ---------------- Frontend (Angular SSR) ----------------
+  - type: web
+    name: if-team-web
+    runtime: docker
+    dockerfilePath: ./if-web-ui/Dockerfile
+    dockerContext: ./if-web-ui
+    plan: free
+    envVars:
+      # URL backend để SSR (server-side) gọi API. KHÔNG kèm "/api" ở cuối.
+      - key: API_INTERNAL_URL
+        value: https://if-team-api.onrender.com
+      - key: NODE_ENV
+        value: production

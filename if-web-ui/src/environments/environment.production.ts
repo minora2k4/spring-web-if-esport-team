@@ -1,7 +1,9 @@
-// Bản build production (Docker): gọi API cùng origin qua reverse proxy nginx.
-// Trình duyệt gọi "/api/..." -> nginx chuyển tiếp sang backend (không dính CORS).
-// Khi render phía server (SSR), apiBaseUrlInterceptor sẽ tự thêm host nội bộ.
+// Bản build production trên Render: frontend và backend là 2 domain riêng (không có
+// nginx gộp origin), nên trình duyệt phải gọi thẳng domain backend.
+// Khi render phía server (SSR), apiBaseUrlInterceptor đọc env API_INTERNAL_URL nên
+// KHÔNG dùng giá trị này — chỉ trình duyệt (client) mới dùng apiUrl bên dưới.
+// Lưu ý: giá trị này được inline lúc build, đổi tên service backend thì phải sửa ở đây.
 export const environment = {
   production: true,
-  apiUrl: '/api',
+  apiUrl: 'https://if-team-api.onrender.com/api',
 };
