@@ -19,8 +19,12 @@ RUN ./mvnw -B -ntp clean package -DskipTests
 FROM eclipse-temurin:25-jre AS runtime
 WORKDIR /app
 
-# Chạy bằng user không phải root cho an toàn.
-RUN useradd -r -u 1001 spring
+# Chạy bằng user không phải root cho an toàn; tạo sẵn thư mục uploads và cấp
+# quyền cho user này. Bắt buộc trên môi trường KHÔNG mount volume (vd Render),
+# nếu không user 'spring' sẽ không ghi được ảnh vào /app (do root sở hữu) -> upload 400.
+RUN useradd -r -u 1001 spring \
+    && mkdir -p /app/uploads \
+    && chown -R spring:spring /app/uploads
 USER spring
 
 # Thư mục lưu ảnh upload (mount volume vào đây trong docker-compose).
