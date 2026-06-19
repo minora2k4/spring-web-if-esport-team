@@ -1,0 +1,20 @@
+package web.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class ApiResponse<T> {
+    private boolean success;
+    private String message;
+    private T data;
+
+    public static <T> ApiResponse<T> ok(T data) {
+        return new ApiResponse<>(true, "Thành công", data);
+    }
+
+    public static <T> ApiResponse<T> empty(String message) {
+        return new ApiResponse<>(false, message, null);
+    }
+}

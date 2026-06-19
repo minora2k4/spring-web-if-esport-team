@@ -1,0 +1,23 @@
+<section class="section">
+  <div class="container">
+    <div class="dash-head">
+      <div>
+        <h2 class="section-title">Bảng <span>điều khiển</span></h2>
+        <p class="section-sub">Xin chào, <b>{{ username }}</b> 👋 Chọn một mục để quản lý.</p>
+      </div>
+      <button class="btn btn-outline" (click)="logout()">Đăng xuất</button>
+    </div>
+    <div class="divider"></div>
+
+    <div class="grid grid-3 dash-grid">
+      <a class="dash-card card card-hover" *ngFor="let c of cards()" [routerLink]="c.path">
+        <div class="dash-icon" [style.background]="c.color + '22'" [style.color]="c.color">{{ c.icon }}</div>
+        <div class="dash-info">
+          <div class="dash-count">{{ c.count }}</div>
+          <div class="dash-title">{{ c.title }}</div>
+        </div>
+        <span class="dash-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,9 @@
+target/
+uploads/
+if-web-ui/
+*.md
+.git/
+.idea/
+.vscode/
+.mvn/wrapper/maven-wrapper.jar
+HELP.md

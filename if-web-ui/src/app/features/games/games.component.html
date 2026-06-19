@@ -1,0 +1,23 @@
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Tựa <span>game</span></h2>
+      <p class="section-sub">Những bộ môn mà Infinity Team đang tranh tài.</p>
+      <div class="divider"></div>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="grid grid-auto" *ngIf="games().length; else empty">
+        <div class="game-card card card-hover" *ngFor="let g of games()">
+          <img class="game-logo" [src]="logo(g)" [alt]="g.name" />
+          <h3 class="game-name">{{ g.name }}</h3>
+        </div>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">🎯</div>Chưa có tựa game nào.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>

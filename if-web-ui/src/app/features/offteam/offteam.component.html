@@ -1,0 +1,35 @@
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Off<span>team</span></h2>
+      <p class="section-sub">Những khoảnh khắc đời thường và kỷ niệm của cả đội.</p>
+      <div class="divider"></div>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="off-list" *ngIf="events().length; else empty">
+        <article class="off-event card" *ngFor="let e of events()">
+          <img class="off-cover" [src]="cover(e)" [alt]="e.title" (click)="open(cover(e))" />
+          <div class="off-body">
+            <h3 class="off-title">{{ e.title }}</h3>
+            <p class="text-muted" *ngIf="e.eventDate">📅 {{ e.eventDate | date: 'dd/MM/yyyy' }}</p>
+
+            <div class="off-thumbs" *ngIf="e.photoUrls?.length">
+              <img *ngFor="let p of e.photoUrls" [src]="p" alt="ảnh" (click)="open(p)" />
+            </div>
+          </div>
+        </article>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">📸</div>Chưa có sự kiện offteam nào.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="modal-backdrop" *ngIf="lightbox()" (click)="closeBox()">
+  <img class="lightbox-img" [src]="lightbox()!" alt="xem ảnh" />
+</div>

@@ -1,0 +1,20 @@
+.bet-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.sum-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px;
+  span:last-child { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+}
+.sum-num { font-size: 34px; font-weight: 900; }
+.sum-num.win { color: var(--success); }
+.sum-num.lose { color: var(--danger); }
+.sum-num.pend { color: var(--warning); }
+
+@media (max-width: 560px) { .bet-summary { grid-template-columns: 1fr; } }

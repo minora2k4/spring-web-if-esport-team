@@ -1,0 +1,71 @@
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <div>
+        <a routerLink="/admin/dashboard" class="admin-back">← Bảng điều khiển</a>
+        <h2 class="admin-title">Quản lý tựa game</h2>
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">＋ Thêm game</button>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="table-wrap" *ngIf="games().length; else empty">
+        <table class="table">
+          <thead><tr><th>Logo</th><th>Tên game</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngFor="let g of games()">
+              <td><img class="thumb-sm" [src]="g.logoUrl || 'https://placehold.co/40x40/eef2ff/6366f1?text='+g.name.charAt(0)" [alt]="g.name" /></td>
+              <td class="fw-700">{{ g.name }}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-outline btn-sm" (click)="openEdit(g)">Sửa</button>
+                  <button class="btn btn-danger btn-sm" (click)="remove(g)">Xóa</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">🎯</div>Chưa có game nào. Hãy thêm game đầu tiên!</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>
+
+<!-- Form modal -->
+<div class="modal-backdrop" *ngIf="showForm()" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ editingId ? 'Sửa game' : 'Thêm game mới' }}</h3>
+      <button class="modal-close" (click)="close()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+      <div class="field">
+        <label class="label">Tên game *</label>
+        <input class="input" [(ngModel)]="form.name" placeholder="VD: Valorant" />
+      </div>
+      <div class="field">
+        <label class="label">Logo game</label>
+        <div class="uploader">
+          <img class="uploader-preview" *ngIf="form.logoUrl"
+               [src]="form.logoUrl" alt="logo" />
+          <label class="upload-btn">
+            📁 {{ uploading() ? 'Đang tải...' : (form.logoUrl ? 'Đổi ảnh' : 'Chọn ảnh từ thiết bị') }}
+            <input type="file" accept="image/*" hidden (change)="onLogo($event)" />
+          </label>
+        </div>
+        <p class="upload-hint">Tải ảnh từ máy tính hoặc điện thoại (PNG, JPG... tối đa 10MB).</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="close()">Hủy</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving() || uploading()">
+        {{ saving() ? 'Đang lưu...' : 'Lưu' }}
+      </button>
+    </div>
+  </div>
+</div>

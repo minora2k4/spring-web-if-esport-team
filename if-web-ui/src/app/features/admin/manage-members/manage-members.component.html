@@ -1,0 +1,103 @@
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <div>
+        <a routerLink="/admin/dashboard" class="admin-back">← Bảng điều khiển</a>
+        <h2 class="admin-title">Quản lý thành viên</h2>
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">＋ Thêm thành viên</button>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="table-wrap" *ngIf="members().length; else empty">
+        <table class="table">
+          <thead><tr><th>Ảnh</th><th>Tên trong game</th><th>Tên thật</th><th>Vị trí</th><th>Trạng thái</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngFor="let m of members()">
+              <td><img class="thumb-sm" [src]="m.avatarUrl || 'https://placehold.co/40x40/eef2ff/6366f1?text='+m.inGameName.charAt(0)" [alt]="m.inGameName" /></td>
+              <td class="fw-700">{{ m.inGameName }}</td>
+              <td>{{ m.realName || '—' }}</td>
+              <td>{{ m.role || '—' }}</td>
+              <td>
+                <span class="badge" [ngClass]="m.isActive ? 'badge-join' : 'badge-muted'">
+                  {{ m.isActive ? 'Đang hoạt động' : 'Ẩn' }}
+                </span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-outline btn-sm" (click)="openEdit(m)">Sửa</button>
+                  <button class="btn btn-danger btn-sm" (click)="remove(m)">Xóa</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">👥</div>Chưa có thành viên nào.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>
+
+<div class="modal-backdrop" *ngIf="showForm()" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ editingId ? 'Sửa thành viên' : 'Thêm thành viên' }}</h3>
+      <button class="modal-close" (click)="close()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+
+      <div class="field">
+        <label class="label">Tên trong game *</label>
+        <input class="input" [(ngModel)]="form.inGameName" placeholder="VD: Minora" />
+      </div>
+      <div class="field">
+        <label class="label">Tên thật</label>
+        <input class="input" [(ngModel)]="form.realName" placeholder="VD: Nguyễn Văn A" />
+      </div>
+      <div class="field">
+        <label class="label">Vị trí / vai trò</label>
+        <input class="input" [(ngModel)]="form.role" placeholder="VD: ADC, Mid, Support..." />
+      </div>
+      <div class="field">
+        <label class="label">Thành tích nổi bật</label>
+        <input class="input" [(ngModel)]="form.achievement" placeholder="VD: MVP mùa giải 2024" />
+      </div>
+      <div class="field">
+        <label class="label">Ảnh đại diện</label>
+        <div class="uploader">
+          <img class="uploader-preview" *ngIf="form.avatarUrl"
+               [src]="form.avatarUrl" alt="avatar" style="border-radius:50%" />
+          <label class="upload-btn">
+            📁 {{ uploading() ? 'Đang tải...' : (form.avatarUrl ? 'Đổi ảnh' : 'Chọn ảnh từ thiết bị') }}
+            <input type="file" accept="image/*" hidden (change)="onAvatar($event)" />
+          </label>
+        </div>
+        <p class="upload-hint">Tải ảnh từ máy tính hoặc điện thoại (PNG, JPG... tối đa 10MB).</p>
+      </div>
+
+      <div class="field">
+        <label class="label">Các tựa game</label>
+        <div class="chips">
+          <span class="chip" *ngFor="let g of games()" [class.active]="hasGame(g.id)" (click)="toggleGame(g.id)">
+            {{ g.name }}
+          </span>
+          <span class="text-muted" *ngIf="!games().length">Chưa có game — hãy thêm game trước.</span>
+        </div>
+      </div>
+
+      <div class="field checkbox-row">
+        <input type="checkbox" id="active" [(ngModel)]="form.isActive" />
+        <label for="active" class="label mb-0">Đang hoạt động (hiển thị công khai)</label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="close()">Hủy</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving() || uploading()">{{ saving() ? 'Đang lưu...' : 'Lưu' }}</button>
+    </div>
+  </div>
+</div>

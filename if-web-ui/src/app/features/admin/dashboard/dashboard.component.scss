@@ -1,0 +1,29 @@
+.dash-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dash-grid { margin-top: 8px; }
+
+.dash-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dash-icon {
+  width: 60px; height: 60px;
+  display: grid; place-items: center;
+  font-size: 28px;
+  border-radius: 16px;
+  flex-shrink: 0;
+}
+
+.dash-info { flex: 1; }
+.dash-count { font-size: 30px; font-weight: 900; line-height: 1; }
+.dash-title { color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+.dash-arrow { color: var(--text-light); font-size: 20px; transition: transform .2s; }
+.dash-card:hover .dash-arrow { transform: translateX(4px); color: var(--primary); }

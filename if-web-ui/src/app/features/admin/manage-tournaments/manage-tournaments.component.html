@@ -1,0 +1,73 @@
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <div>
+        <a routerLink="/admin/dashboard" class="admin-back">← Bảng điều khiển</a>
+        <h2 class="admin-title">Quản lý giải đấu</h2>
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">＋ Thêm giải đấu</button>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="table-wrap" *ngIf="tournaments().length; else empty">
+        <table class="table">
+          <thead><tr><th>Tên giải</th><th>Tựa game</th><th>Thành tích</th><th>Ngày</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngFor="let t of tournaments()">
+              <td class="fw-700">{{ t.name }}</td>
+              <td>{{ t.game?.name || '—' }}</td>
+              <td>{{ t.achievement || '—' }}</td>
+              <td>{{ t.startDate ? (t.startDate | date: 'dd/MM/yyyy') : '—' }}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-outline btn-sm" (click)="openEdit(t)">Sửa</button>
+                  <button class="btn btn-danger btn-sm" (click)="remove(t)">Xóa</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">🏆</div>Chưa có giải đấu nào.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>
+
+<div class="modal-backdrop" *ngIf="showForm()" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ editingId ? 'Sửa giải đấu' : 'Thêm giải đấu' }}</h3>
+      <button class="modal-close" (click)="close()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+      <div class="field">
+        <label class="label">Tên giải đấu *</label>
+        <input class="input" [(ngModel)]="form.name" placeholder="VD: VCS Mùa Xuân 2025" />
+      </div>
+      <div class="field">
+        <label class="label">Tựa game *</label>
+        <select class="select" [(ngModel)]="form.gameId">
+          <option [ngValue]="0" disabled>-- Chọn game --</option>
+          <option *ngFor="let g of games()" [ngValue]="g.id">{{ g.name }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">Thành tích</label>
+        <input class="input" [(ngModel)]="form.achievement" placeholder="VD: Top 1, Á quân..." />
+      </div>
+      <div class="field">
+        <label class="label">Ngày bắt đầu</label>
+        <input class="input" type="date" [(ngModel)]="form.startDate" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="close()">Hủy</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? 'Đang lưu...' : 'Lưu' }}</button>
+    </div>
+  </div>
+</div>

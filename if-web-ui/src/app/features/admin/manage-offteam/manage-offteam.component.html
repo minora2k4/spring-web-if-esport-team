@@ -1,0 +1,88 @@
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <div>
+        <a routerLink="/admin/dashboard" class="admin-back">← Bảng điều khiển</a>
+        <h2 class="admin-title">Quản lý sự kiện Offteam</h2>
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">＋ Thêm sự kiện</button>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="table-wrap" *ngIf="events().length; else empty">
+        <table class="table">
+          <thead><tr><th>Ảnh bìa</th><th>Tiêu đề</th><th>Ngày</th><th>Số ảnh</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngFor="let e of events()">
+              <td><img class="thumb-sm" [src]="e.coverPhotoUrl || 'https://placehold.co/40x40/eef2ff/6366f1?text=📸'" [alt]="e.title" /></td>
+              <td class="fw-700">{{ e.title }}</td>
+              <td>{{ e.eventDate ? (e.eventDate | date: 'dd/MM/yyyy') : '—' }}</td>
+              <td>{{ e.photoUrls?.length || 0 }} ảnh</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-outline btn-sm" (click)="openEdit(e)">Sửa</button>
+                  <button class="btn btn-danger btn-sm" (click)="remove(e)">Xóa</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">📸</div>Chưa có sự kiện offteam nào.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>
+
+<div class="modal-backdrop" *ngIf="showForm()" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ editingId ? 'Sửa sự kiện' : 'Thêm sự kiện' }}</h3>
+      <button class="modal-close" (click)="close()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+      <div class="field">
+        <label class="label">Tiêu đề *</label>
+        <input class="input" [(ngModel)]="form.title" placeholder="VD: Offteam tháng 3/2025" />
+      </div>
+      <div class="field">
+        <label class="label">Ngày diễn ra</label>
+        <input class="input" type="date" [(ngModel)]="form.eventDate" />
+      </div>
+      <div class="field">
+        <label class="label">Ảnh bìa</label>
+        <div class="uploader">
+          <img class="uploader-preview" *ngIf="form.coverPhotoUrl"
+               [src]="form.coverPhotoUrl" alt="cover" />
+          <label class="upload-btn">
+            📁 {{ uploading() ? 'Đang tải...' : (form.coverPhotoUrl ? 'Đổi ảnh' : 'Chọn ảnh bìa') }}
+            <input type="file" accept="image/*" hidden (change)="onCover($event)" />
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Ảnh trong album</label>
+        <label class="upload-btn">
+          📁 {{ uploading() ? 'Đang tải...' : 'Thêm ảnh từ thiết bị' }}
+          <input type="file" accept="image/*" multiple hidden (change)="onPhotos($event)" />
+        </label>
+        <div class="photo-grid" *ngIf="photos().length">
+          <div class="photo-item" *ngFor="let p of photos()">
+            <img [src]="p" alt="ảnh" />
+            <button type="button" class="photo-remove" (click)="removePhoto(p)">×</button>
+          </div>
+        </div>
+        <p class="upload-hint">Có thể chọn nhiều ảnh cùng lúc (PNG, JPG... tối đa 10MB/ảnh).</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="close()">Hủy</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving() || uploading()">{{ saving() ? 'Đang lưu...' : 'Lưu' }}</button>
+    </div>
+  </div>
+</div>

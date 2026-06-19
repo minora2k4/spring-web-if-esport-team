@@ -1,0 +1,80 @@
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <div>
+        <a routerLink="/admin/dashboard" class="admin-back">← Bảng điều khiển</a>
+        <h2 class="admin-title">Quản lý kèo đấu</h2>
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">＋ Thêm kèo</button>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="table-wrap" *ngIf="bets().length; else empty">
+        <table class="table">
+          <thead><tr><th>Đối thủ</th><th>Game</th><th>Ngày</th><th>Mức kèo</th><th>Kết quả</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngFor="let b of bets()">
+              <td class="fw-700">{{ b.opponent }}</td>
+              <td>{{ b.game?.name || '—' }}</td>
+              <td>{{ b.betDate ? (b.betDate | date: 'dd/MM/yyyy') : '—' }}</td>
+              <td>{{ b.amount != null ? (b.amount | number) + ' đ' : '—' }}</td>
+              <td><span class="badge" [ngClass]="badgeClass(b.result)">{{ label(b.result) }}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-outline btn-sm" (click)="openEdit(b)">Sửa</button>
+                  <button class="btn btn-danger btn-sm" (click)="remove(b)">Xóa</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">🎮</div>Chưa có kèo đấu nào.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>
+
+<div class="modal-backdrop" *ngIf="showForm()" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ editingId ? 'Sửa kèo đấu' : 'Thêm kèo đấu' }}</h3>
+      <button class="modal-close" (click)="close()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+      <div class="field">
+        <label class="label">Đối thủ *</label>
+        <input class="input" [(ngModel)]="form.opponent" placeholder="VD: Team ABC" />
+      </div>
+      <div class="field">
+        <label class="label">Tựa game *</label>
+        <select class="select" [(ngModel)]="form.gameId">
+          <option [ngValue]="0" disabled>-- Chọn game --</option>
+          <option *ngFor="let g of games()" [ngValue]="g.id">{{ g.name }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">Kết quả</label>
+        <select class="select" [(ngModel)]="form.result">
+          <option *ngFor="let r of results" [ngValue]="r">{{ label(r) }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">Mức kèo (đ)</label>
+        <input class="input" type="number" [(ngModel)]="form.amount" placeholder="VD: 100000" />
+      </div>
+      <div class="field">
+        <label class="label">Ngày diễn ra</label>
+        <input class="input" type="date" [(ngModel)]="form.betDate" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="close()">Hủy</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? 'Đang lưu...' : 'Lưu' }}</button>
+    </div>
+  </div>
+</div>

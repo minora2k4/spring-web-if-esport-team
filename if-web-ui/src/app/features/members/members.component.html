@@ -1,0 +1,69 @@
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Thành <span>viên</span></h2>
+      <p class="section-sub">Những chiến binh làm nên sức mạnh của Infinity Team.</p>
+      <div class="divider"></div>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="grid grid-auto" *ngIf="members().length; else empty">
+        <article class="member-card card card-hover" *ngFor="let m of members()" (click)="openDetail(m)">
+          <div class="member-top">
+            <img class="member-avatar" [src]="avatar(m)" [alt]="m.inGameName" />
+            <span class="badge badge-info member-role" *ngIf="m.role">{{ m.role }}</span>
+          </div>
+          <h3 class="member-name">{{ m.inGameName }}</h3>
+          <p class="member-real" *ngIf="m.realName">{{ m.realName }}</p>
+          <p class="member-ach" *ngIf="m.achievement">🏅 {{ m.achievement }}</p>
+
+          <div class="member-games" *ngIf="m.games?.length">
+            <span class="badge badge-muted" *ngFor="let g of m.games">{{ g.name }}</span>
+          </div>
+
+          <span class="member-more">Xem chi tiết →</span>
+        </article>
+      </div>
+
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">👥</div>Chưa có thành viên nào được công bố.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>
+
+<!-- Member detail popup -->
+<div class="modal-backdrop" *ngIf="selected() as m" (click)="closeDetail()">
+  <div class="modal member-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close detail-close" (click)="closeDetail()">×</button>
+    <div class="detail-hero">
+      <img class="detail-avatar" [src]="avatar(m)" [alt]="m.inGameName" />
+      <h3 class="detail-name">{{ m.inGameName }}</h3>
+      <span class="badge badge-info" *ngIf="m.role">{{ m.role }}</span>
+    </div>
+    <div class="detail-body">
+      <div class="detail-row" *ngIf="m.realName">
+        <span class="detail-label">Tên thật</span>
+        <span class="detail-value">{{ m.realName }}</span>
+      </div>
+      <div class="detail-row" *ngIf="m.achievement">
+        <span class="detail-label">Thành tích</span>
+        <span class="detail-value">🏅 {{ m.achievement }}</span>
+      </div>
+      <div class="detail-row" *ngIf="m.games?.length">
+        <span class="detail-label">Tựa game</span>
+        <span class="detail-value chips">
+          <span class="badge badge-muted" *ngFor="let g of m.games">{{ g.name }}</span>
+        </span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Trạng thái</span>
+        <span class="badge" [ngClass]="m.isActive ? 'badge-join' : 'badge-muted'">
+          {{ m.isActive ? 'Đang hoạt động' : 'Ẩn' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

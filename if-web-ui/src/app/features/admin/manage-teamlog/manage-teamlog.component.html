@@ -1,0 +1,75 @@
+<section class="section">
+  <div class="container">
+    <div class="admin-head">
+      <div>
+        <a routerLink="/admin/dashboard" class="admin-back">← Bảng điều khiển</a>
+        <h2 class="admin-title">Quản lý nhật ký đội</h2>
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">＋ Thêm nhật ký</button>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="table-wrap" *ngIf="logs().length; else empty">
+        <table class="table">
+          <thead><tr><th>Loại</th><th>Nội dung</th><th>Thành viên</th><th>Ngày</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngFor="let l of logs()">
+              <td><span class="badge" [ngClass]="badgeClass(l.type)">{{ label(l.type) }}</span></td>
+              <td>{{ l.description }}</td>
+              <td>{{ l.member?.inGameName || '—' }}</td>
+              <td>{{ l.eventDate ? (l.eventDate | date: 'dd/MM/yyyy') : '—' }}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn btn-outline btn-sm" (click)="openEdit(l)">Sửa</button>
+                  <button class="btn btn-danger btn-sm" (click)="remove(l)">Xóa</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">📋</div>Chưa có nhật ký nào.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>
+
+<div class="modal-backdrop" *ngIf="showForm()" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>{{ editingId ? 'Sửa nhật ký' : 'Thêm nhật ký' }}</h3>
+      <button class="modal-close" (click)="close()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="error()">{{ error() }}</div>
+      <div class="field">
+        <label class="label">Loại sự kiện</label>
+        <select class="select" [(ngModel)]="form.type">
+          <option *ngFor="let t of types" [ngValue]="t">{{ label(t) }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">Nội dung *</label>
+        <textarea class="textarea" [(ngModel)]="form.description" placeholder="VD: Minora gia nhập đội với vai trò ADC"></textarea>
+      </div>
+      <div class="field">
+        <label class="label">Thành viên liên quan (tùy chọn)</label>
+        <select class="select" [(ngModel)]="form.memberId">
+          <option [ngValue]="null">-- Không gắn thành viên --</option>
+          <option *ngFor="let m of members()" [ngValue]="m.id">{{ m.inGameName }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">Ngày diễn ra</label>
+        <input class="input" type="date" [(ngModel)]="form.eventDate" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" (click)="close()">Hủy</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? 'Đang lưu...' : 'Lưu' }}</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Giải <span>đấu</span></h2>
+      <p class="section-sub">Hành trình chinh phục các đấu trường của Infinity Team.</p>
+      <div class="divider"></div>
+    </div>
+
+    <div class="loader" *ngIf="loading()"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="timeline" *ngIf="tournaments().length; else empty">
+        <article class="tl-item" *ngFor="let t of tournaments()">
+          <div class="tl-dot"></div>
+          <div class="tl-card card card-hover">
+            <div class="tl-head">
+              <span class="badge badge-achievement" *ngIf="t.game">{{ t.game.name }}</span>
+              <span class="tl-date" *ngIf="t.startDate">{{ t.startDate | date: 'dd/MM/yyyy' }}</span>
+            </div>
+            <h3 class="tl-name">{{ t.name }}</h3>
+            <p class="tl-ach" *ngIf="t.achievement">🏆 {{ t.achievement }}</p>
+          </div>
+        </article>
+      </div>
+      <ng-template #empty>
+        <div class="empty-state"><div class="empty-icon">🏆</div>Chưa có giải đấu nào.</div>
+      </ng-template>
+    </ng-container>
+  </div>
+</section>

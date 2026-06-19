@@ -1,0 +1,98 @@
+<!-- Hero -->
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <h1 class="hero-title">
+        Vươn tới giới hạn<br />vô cực
+      </h1>
+      <p class="hero-desc">
+        Chào mừng đến với <b>Infinity Team</b> — nơi hội tụ những tài năng Esports trẻ,
+        bản lĩnh và khát khao chiến thắng. Cùng theo dõi hành trình, thành tích và
+        những khoảnh khắc đáng nhớ của chúng tôi.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/members" class="btn btn-primary">Gặp gỡ đội hình</a>
+        <a routerLink="/tournaments" class="btn btn-outline">Xem giải đấu</a>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="hero-emblem">∞</div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="container">
+  <div class="stats-grid">
+    <div class="stat-card card card-hover">
+      <div class="stat-num">{{ stats().members }}</div>
+      <div class="stat-label">Thành viên</div>
+    </div>
+    <div class="stat-card card card-hover">
+      <div class="stat-num">{{ stats().games }}</div>
+      <div class="stat-label">Tựa game</div>
+    </div>
+    <div class="stat-card card card-hover">
+      <div class="stat-num">{{ stats().tournaments }}</div>
+      <div class="stat-label">Giải đấu</div>
+    </div>
+    <div class="stat-card card card-hover">
+      <div class="stat-num">{{ stats().wins }}</div>
+      <div class="stat-label">Trận thắng</div>
+    </div>
+  </div>
+</section>
+
+<!-- Roster preview -->
+<section class="section">
+  <div class="container">
+    <div class="section-head flex justify-between items-center">
+      <div>
+        <h2 class="section-title">Đội <span>hình</span></h2>
+        <div class="divider"></div>
+      </div>
+      <a routerLink="/members" class="btn btn-ghost btn-sm">Xem tất cả →</a>
+    </div>
+
+    <div class="grid grid-4" *ngIf="members().length; else noMembers">
+      <div class="member-mini card card-hover" *ngFor="let m of members()">
+        <img class="member-mini-avatar"
+             [src]="m.avatarUrl || 'https://placehold.co/120x120/fee2e2/dc2626?text=' + m.inGameName.charAt(0)"
+             [alt]="m.inGameName" />
+        <div class="member-mini-name">{{ m.inGameName }}</div>
+        <div class="badge badge-info" *ngIf="m.role">{{ m.role }}</div>
+      </div>
+    </div>
+    <ng-template #noMembers>
+      <div class="empty-state"><div class="empty-icon">👥</div>Chưa có thành viên nào.</div>
+    </ng-template>
+  </div>
+</section>
+
+<!-- Tournaments preview -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-head flex justify-between items-center">
+      <div>
+        <h2 class="section-title">Giải đấu <span>nổi bật</span></h2>
+        <div class="divider"></div>
+      </div>
+      <a routerLink="/tournaments" class="btn btn-ghost btn-sm">Xem tất cả →</a>
+    </div>
+
+    <div class="grid grid-3" *ngIf="tournaments().length; else noTours">
+      <div class="card card-hover tour-card" *ngFor="let t of tournaments()">
+        <div class="tour-game badge badge-achievement" *ngIf="t.game">{{ t.game.name }}</div>
+        <h3>{{ t.name }}</h3>
+        <p class="text-muted" *ngIf="t.achievement">🏅 {{ t.achievement }}</p>
+        <p class="text-muted" *ngIf="t.startDate">📅 {{ t.startDate | date: 'dd/MM/yyyy' }}</p>
+      </div>
+    </div>
+    <ng-template #noTours>
+      <div class="empty-state"><div class="empty-icon">🏆</div>Chưa có giải đấu nào.</div>
+    </ng-template>
+  </div>
+</section>

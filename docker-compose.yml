@@ -1,0 +1,74 @@
+# Toàn bộ hệ thống IF Team Web: PostgreSQL + Backend (Spring Boot) +
+# Frontend (Angular SSR) + Nginx (reverse proxy, cổng vào duy nhất :80).
+#
+#   docker compose up -d --build      # build & chạy nền
+#   docker compose logs -f            # xem log
+#   docker compose down               # dừng (giữ dữ liệu)
+#   docker compose down -v            # dừng & xoá luôn dữ liệu DB + ảnh
+
+services:
+  # ---------------- Cơ sở dữ liệu ----------------
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ifweb}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ifweb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ---------------- Backend (Spring Boot) ----------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-ifweb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_JPA_SHOW_SQL: "false"
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-infinity-team-super-secret-key-must-be-at-least-256-bits-long}
+      APP_CORS_ALLOWED_ORIGINS: ${PUBLIC_ORIGIN:-http://localhost}
+      APP_UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+
+  # ---------------- Frontend (Angular SSR) ----------------
+  frontend:
+    build:
+      context: ./if-web-ui
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      PORT: "4000"
+      # URL nội bộ để SSR gọi backend (trong cùng mạng Docker).
+      API_INTERNAL_URL: http://backend:8081
+
+  # ---------------- Nginx (reverse proxy) ----------------
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "${PUBLIC_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
+volumes:
+  pgdata:
+  uploads:

@@ -1,0 +1,46 @@
+<nav class="navbar">
+  <div class="nav-inner container">
+
+    <!-- Logo -->
+    <a routerLink="/" class="nav-logo" (click)="close()">
+      <span class="logo-mark">∞</span>
+      <span class="logo-text">INFINITY<b>TEAM</b></span>
+    </a>
+
+    <!-- Desktop / mobile menu -->
+    <ul class="nav-menu" [class.open]="open()">
+      <li *ngFor="let link of links">
+        <a [routerLink]="link.path" routerLinkActive="active" (click)="close()">
+          <span class="icon" [innerHTML]="safe(link.icon)"></span> {{ link.label }}
+        </a>
+      </li>
+
+      <li class="nav-cta-mobile">
+        <ng-container *ngIf="loggedIn | async; else loginMobile">
+          <a routerLink="/admin/dashboard" class="btn btn-outline btn-sm" (click)="close()">Bảng điều khiển</a>
+          <button class="btn btn-ghost btn-sm" (click)="logout()">Đăng xuất</button>
+        </ng-container>
+        <ng-template #loginMobile>
+          <a routerLink="/admin/login" class="btn btn-primary btn-sm" (click)="close()">Đăng nhập Admin</a>
+        </ng-template>
+      </li>
+    </ul>
+
+    <!-- Desktop CTA -->
+    <div class="nav-cta">
+      <ng-container *ngIf="loggedIn | async; else loginDesktop">
+        <a routerLink="/admin/dashboard" class="btn btn-outline btn-sm">⚙️ Quản trị</a>
+        <button class="btn btn-ghost btn-sm" (click)="logout()">Đăng xuất</button>
+      </ng-container>
+      <ng-template #loginDesktop>
+        <a routerLink="/admin/login" class="btn btn-primary btn-sm">Đăng nhập</a>
+      </ng-template>
+    </div>
+
+    <!-- Burger -->
+    <button class="burger" (click)="toggle()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+
+  </div>
+</nav>
