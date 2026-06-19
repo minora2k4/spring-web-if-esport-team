@@ -1,9 +1,6 @@
 # 🎮 Infinity Team — Website Esports
 
-Website chính thức của đội tuyển Esports **Infinity Team (IF Team)**. Đây là nơi người hâm mộ,
-tuyển thủ và nhà tài trợ có thể theo dõi đội hình, lịch sử giải đấu, kết quả các kèo đấu,
-album offteam và nhật ký hoạt động của đội. Trang quản trị (admin) cho phép quản lý toàn bộ
-nội dung này một cách trực quan.
+Website chính thức của đội tuyển Esports **Infinity Team (IF Team)**.
 
 Dự án gồm **2 phần độc lập**:
 
@@ -32,7 +29,7 @@ Dự án gồm **2 phần độc lập**:
 
 ---
 
-## 🧰 Yêu cầu môi trường
+## Yêu cầu môi trường
 
 Hãy cài đặt sẵn các phần mềm sau:
 
@@ -43,7 +40,7 @@ Hãy cài đặt sẵn các phần mềm sau:
 
 ---
 
-## ⚡ Cài đặt nhanh (TL;DR)
+## Cài đặt nhanh (TL;DR)
 
 ```bash
 # 1. Tạo database "ifweb" trong PostgreSQL (xem chi tiết bên dưới)
@@ -61,7 +58,7 @@ Sau đó mở trình duyệt: **http://localhost:4200**
 
 ---
 
-## 🗄 Bước 1 — Chuẩn bị cơ sở dữ liệu (PostgreSQL)
+## Bước 1 — Chuẩn bị cơ sở dữ liệu (PostgreSQL)
 
 Backend kết nối tới một database tên **`ifweb`**. Tạo database này trước khi chạy:
 
@@ -85,7 +82,7 @@ tạo/cập nhật toàn bộ bảng dựa trên các entity khi backend khởi 
 
 ---
 
-## ☕ Bước 2 — Chạy Backend (Spring Boot)
+## Bước 2 — Chạy Backend (Spring Boot)
 
 Tại **thư mục gốc** của dự án:
 
@@ -124,7 +121,7 @@ Các lệnh Maven hữu ích khác:
 
 ---
 
-## 🅰️ Bước 3 — Chạy Frontend (Angular)
+## Bước 3 — Chạy Frontend (Angular)
 
 Mở **một terminal mới**, vào thư mục `if-web-ui`:
 
@@ -158,7 +155,7 @@ npm run serve:ssr:if-web-ui   # chạy bản build SSR đã đóng gói
 
 ---
 
-## 🔐 Đăng nhập quản trị
+## Đăng nhập quản trị
 
 Tài khoản admin mặc định được tạo tự động ở lần chạy backend đầu tiên:
 
@@ -178,7 +175,7 @@ Cách đăng nhập:
 
 ---
 
-## ✨ Tính năng
+## Tính năng
 
 ### Trang công khai (ai cũng xem được)
 - **Trang chủ** — hero giới thiệu đội, thống kê nhanh (số thành viên, game, giải đấu, trận thắng), đội hình & giải đấu nổi bật.
@@ -204,7 +201,7 @@ Cách đăng nhập:
 
 ---
 
-## 🌐 Danh sách API
+## Danh sách API
 
 Tất cả endpoint có tiền tố `/api`. Endpoint công khai dùng `GET`; thao tác ghi nằm dưới
 `/api/admin/**` và **yêu cầu JWT** (vai trò `ADMIN`).
@@ -272,7 +269,7 @@ if-web/
 
 ---
 
-## 📦 Build production
+## Build production
 
 **Backend** — tạo file `.jar`:
 ```bash
@@ -287,7 +284,7 @@ npm run build
 npm run serve:ssr:if-web-ui     # chạy server SSR từ thư mục dist/
 ```
 
-### 🐳 Triển khai bằng Docker (khuyến nghị)
+### Triển khai bằng Docker (khuyến nghị)
 
 Muốn chạy cả hệ thống (DB + backend + frontend) chỉ bằng một lệnh, không cần cài Java/Node/PostgreSQL:
 
@@ -295,26 +292,4 @@ Muốn chạy cả hệ thống (DB + backend + frontend) chỉ bằng một l�
 cp .env.example .env            # đổi mật khẩu & JWT secret
 docker compose up -d --build    # mở http://localhost
 ```
-
-Xem hướng dẫn deploy chi tiết (server thật, HTTPS, sao lưu dữ liệu...) tại **[`DEPLOY.md`](DEPLOY.md)**.
-
 ---
-
-## 🛠 Xử lý sự cố thường gặp
-
-| Triệu chứng | Nguyên nhân & cách khắc phục |
-|-------------|------------------------------|
-| Backend báo lỗi kết nối DB | PostgreSQL chưa chạy, hoặc chưa tạo database `ifweb`, hoặc sai user/password trong `application.properties`. |
-| Frontend gọi API bị lỗi **CORS** | Đảm bảo `app.cors.allowed-origins` (mặc định `http://localhost:4200`) khớp với cổng frontend đang chạy. |
-| Trang admin bị đá về `/admin/login` | Token hết hạn hoặc chưa đăng nhập. Đăng nhập lại bằng `admin` / `admin123`. |
-| `java -version` không phải 25 | Cài đúng JDK 25 và đặt `JAVA_HOME` trỏ tới nó. |
-| Cổng `8081` hoặc `4200` bị chiếm | Đổi `server.port` trong `application.properties` (và cập nhật `apiUrl` phía frontend), hoặc chạy `ng serve --port <cổng-khác>`. |
-| Lỗi thiếu thư viện khi chạy frontend | Chạy lại `npm install` trong thư mục `if-web-ui`. |
-
----
-
-## 📌 Ghi chú bản quyền
-
-Mã nguồn khởi tạo của khóa học **"Java Spring Siêu Tốc"** thuộc về **Hỏi Dân IT**
-(website: https://hoidanit.vn). Chỉ dùng cho mục đích học tập cá nhân; **không** chia sẻ
-công khai lên repository/diễn đàn. Liên hệ: **admin@hoidanit.vn**.
