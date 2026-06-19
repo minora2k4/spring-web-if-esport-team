@@ -5,5 +5,5 @@
 // Lưu ý: giá trị này được inline lúc build, đổi tên service backend thì phải sửa ở đây.
 export const environment = {
   production: true,
-  apiUrl: 'https://if-team-api.onrender.com/api',
+  apiUrl: 'https://spring-web-if-esport-team-v2.onrender.com/api',
 };

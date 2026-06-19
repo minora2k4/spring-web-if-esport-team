@@ -21,11 +21,10 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
-    disk:
-      # Bắt buộc: giữ ảnh upload qua các lần redeploy (filesystem Render là ephemeral).
-      name: uploads
-      mountPath: /app/uploads
-      sizeGB: 1
+    # LƯU Ý: gói Free của Render KHÔNG hỗ trợ Disk persistent.
+    # Hệ quả: thư mục /app/uploads là ephemeral -> ảnh upload sẽ MẤT mỗi lần
+    # service restart/redeploy. Muốn ảnh tồn tại lâu dài, nâng plan này lên
+    # Starter trở lên rồi thêm lại block "disk" (mountPath: /app/uploads, sizeGB: 1).
     envVars:
       # DB: user/password lấy tự động từ service ifweb-db.
       - key: SPRING_DATASOURCE_USERNAME
