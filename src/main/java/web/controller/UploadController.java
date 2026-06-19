@@ -3,22 +3,24 @@ package web.controller;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import web.dto.response.ApiResponse;
+import web.model.UploadedImage;
+import web.repository.UploadedImageRepository;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
- * Nhận file ảnh tải lên từ thiết bị (máy tính / điện thoại), lưu vào ổ đĩa
- * và trả về URL công khai để client dùng cho avatar / logo / ảnh offteam.
+ * Nhận file ảnh tải lên từ thiết bị (máy tính / điện thoại), lưu vào DATABASE
+ * (cột bytea) và trả về URL công khai để client dùng cho avatar / logo / ảnh offteam.
+ *
+ * Ảnh được lưu trong DB (không phải ổ đĩa) để tồn tại bền vững qua các lần restart
+ * trên môi trường không có disk persistent. URL trả về vẫn giữ định dạng cũ
+ * "/uploads/<filename>" nên frontend và dữ liệu sẵn có không cần thay đổi.
  */
 @RestController
 @RequestMapping("/api/admin")
@@ -27,8 +29,7 @@ public class UploadController extends BaseController {
 
     private static final Logger log = LoggerFactory.getLogger(UploadController.class);
 
-    @Value("${app.upload.dir}")
-    private String uploadDir;
+    private final UploadedImageRepository imageRepository;
 
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<String>> upload(@RequestParam("file") MultipartFile file) {
@@ -42,20 +43,17 @@ public class UploadController extends BaseController {
         }
 
         try {
-            Path dir = Paths.get(uploadDir).toAbsolutePath().normalize();
-            Files.createDirectories(dir);
-
             String ext = extractExtension(file.getOriginalFilename());
             String filename = UUID.randomUUID() + ext;
-            Path target = dir.resolve(filename);
-            file.transferTo(target);
+
+            imageRepository.save(new UploadedImage(filename, contentType, file.getBytes()));
 
             String url = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/uploads/")
                     .path(filename)
                     .toUriString();
 
-            log.info("[UPLOAD] Saved {} ({} bytes)", filename, file.getSize());
+            log.info("[UPLOAD] Saved {} ({} bytes) vào database", filename, file.getSize());
             return okResponse(url);
         } catch (IOException e) {
             log.error("[UPLOAD] Failed: {}", e.getMessage());
