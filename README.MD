@@ -1,9 +1,6 @@
 # 🎮 Infinity Team — Website Esports
 
-Website chính thức của đội tuyển Esports **Infinity Team (IF Team)**. Đây là nơi người hâm mộ,
-tuyển thủ và nhà tài trợ có thể theo dõi đội hình, lịch sử giải đấu, kết quả các kèo đấu,
-album offteam và nhật ký hoạt động của đội. Trang quản trị (admin) cho phép quản lý toàn bộ
-nội dung này một cách trực quan.
+Website chính thức của đội tuyển Esports **Infinity Team (IF Team)**.
 
 Dự án gồm **2 phần độc lập**:
 
